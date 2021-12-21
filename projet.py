@@ -1,41 +1,61 @@
 import cv2
 import numpy as np
+
 #import matplotlib.pyplot as plt
 
-img = cv2.imread('image2.jpg',cv2.IMREAD_GRAYSCALE)
+img = cv2.imread('image3.jpg',cv2.IMREAD_COLOR)
+
+
 voisinage=5
-def filtrem(img):
-    h,w =img.shape
-    imgMoy=np.zeros(img.shape,np.uint64)
+def filtrem(img,tailleBloc):
+    kernel = np.ones((tailleBloc,tailleBloc),np.float32)/(tailleBloc*tailleBloc)
+    imgMoy = cv2.filter2D(img,-1,kernel)
+    '''h,w,c =img.shape 
+    imgMoy=np.zeros(img.shape,np.float64)
     for y in range(h):
         for x in range(w):
             if x<voisinage/2 or x>w-voisinage/2 or y<voisinage/2 or y>h-voisinage/2:
-             imgMoy[y,x] = img[x,x]
-
-            
+             imgMoy[y,x] = img[y,x]         
             else:
                imgV=img[int(y-voisinage/2):int(y+voisinage/2)+1,int(x-voisinage/2):int(y+voisinage/2)+1]
-               imgMoy[y,x]=np.median(imgV)
+               imgMoy[y,x]=np.mean(imgV)'''
     return imgMoy
+def filtremediane(img):
+    image = cv2.medianBlur(img,3)
+    return image
+def filtreMorpho(image,filtre,shape,tailleNoyau):
 
-def QIR(img,A,C):
-    h,w = img.shape
-    for i in range(h):
-        for j in range(w):
-            if(img[i,j]<=A):
-                img[i,j]=0
-            elif(img[i,j]>=C):
-                img[i,j]=255
-    cv2.imwrite("QIR/A :"+str(A)+" et C :"+str(C)+".png", img)
-    
-img = cv2.imread("C:/Users/Yasmine/Desktop/image processing/OCR/Projet/projet I/image4.jpg", cv2.IMREAD_GRAYSCALE)
+    #creer un noyau
+    if shape=="Rect":
+        noyau = (cv2.getStructuringElement(cv2.MORPH_RECT,(tailleNoyau,tailleNoyau)))
+    elif shape=="Ellipse":
+        noyau = (cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(tailleNoyau,tailleNoyau)))
+    elif shape=="Cross":
+        noyau = (cv2.getStructuringElement(cv2.MORPH_CROSS,(tailleNoyau,tailleNoyau)))
 
-C=140
-for A in range(20,130):
-    QIR(img,A,C)
-A=20
-for A in range(140,255):
-    QIR(img,A,C)
-'''imgMoy=filtrem(img)
-cv2.imshow("kek",img)
-cv2.waitKey(0)'''
+    #initialiser l'image filtré
+    filtredImage=np.zeros((image.shape[0],image.shape[1],3), np.uint8)
+    #Appliquer les filtres
+    if filtre=="Erosion":        
+        filtredImage = cv2.erode(image,noyau)
+    elif filtre =="Dilation":
+        filtredImage = cv2.dilate(image,noyau)
+    elif filtre =="Opening":
+        filtredImage = cv2.morphologyEx(image,cv2.MORPH_OPEN,noyau)
+    elif filtre =="Closing":
+        filtredImage = cv2.morphologyEx(image,cv2.MORPH_CLOSE,noyau)
+    elif filtre =="Gradient":
+        filtredImage = cv2.morphologyEx(image,cv2.MORPH_GRADIENT,noyau)
+    elif filtre =="BlackHat":
+        filtredImage = cv2.morphologyEx(image,cv2.MORPH_BLACKHAT,noyau)
+    elif filtre =="TopHat":
+        filtredImage = cv2.morphologyEx(image,cv2.MORPH_TOPHAT,noyau)
+    return filtredImage
+
+imgg=filtrem(img,5)
+imgMoy=filtreMorpho(imgg,"Gradient","Rect",1)
+
+
+cv2.imshow("original",img)
+cv2.imshow("filitre moyenneur",imgMoy)
+cv2.waitKey(0)
