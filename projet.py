@@ -23,6 +23,22 @@ def filtrem(img,tailleBloc):
 def filtremediane(img):
     image = cv2.medianBlur(img,3)
     return image
+def filtrevoisinage(image,voisinage):
+ image= cv2.imread('image3.jpg',cv2.IMREAD_GRAYSCALE)
+ h,w = image.shape
+ imgRes = np.zeros(image.shape, np.uint8)
+
+ 
+
+ for y in range(h):
+    for x in range(w):
+        if x<voisinage/2 or x>w-voisinage/2 or y<voisinage/2 or y>h-voisinage/2:
+            imgRes[y,x] = image[y,x]
+        else:
+            imgv = image[int(y-voisinage/2):int(y+voisinage/2)+1,int(x-voisinage/2):int(x+voisinage/2)+1]
+            imgRes[y,x] = np.mean(imgv)
+ return imgRes
+
 def filtreMorpho(image,filtre,shape,tailleNoyau):
 
     #creer un noyau
@@ -52,8 +68,8 @@ def filtreMorpho(image,filtre,shape,tailleNoyau):
         filtredImage = cv2.morphologyEx(image,cv2.MORPH_TOPHAT,noyau)
     return filtredImage
 
-imgg=filtrem(img,5)
-imgMoy=filtreMorpho(imgg,"Gradient","Rect",1)
+#imgg=filtrem(img,5)
+imgMoy=filtrevoisinage(img,1)
 
 
 cv2.imshow("original",img)
