@@ -18,6 +18,24 @@ def filtrem(img):
                imgMoy[y,x]=np.median(imgV)
     return imgMoy
 
-imgMoy=filtrem(img)
+def QIR(img,A,C):
+    h,w = img.shape
+    for i in range(h):
+        for j in range(w):
+            if(img[i,j]<=A):
+                img[i,j]=0
+            elif(img[i,j]>=C):
+                img[i,j]=255
+    cv2.imwrite("QIR/A :"+str(A)+" et C :"+str(C)+".png", img)
+    
+img = cv2.imread("C:/Users/Yasmine/Desktop/image processing/OCR/Projet/projet I/image4.jpg", cv2.IMREAD_GRAYSCALE)
+
+C=140
+for A in range(20,130):
+    QIR(img,A,C)
+A=20
+for A in range(140,255):
+    QIR(img,A,C)
+'''imgMoy=filtrem(img)
 cv2.imshow("kek",img)
-cv2.waitKey(0)
+cv2.waitKey(0)'''
