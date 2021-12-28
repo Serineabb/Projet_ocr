@@ -1,6 +1,6 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QFileDialog
+from PyQt5.QtWidgets import QFileDialog, QSlider
 from PyQt5.QtGui import QImage
 import cv2 as cv
 import numpy as np
@@ -30,6 +30,8 @@ class Ui_MainWindow(object):
         self.horizontalLayout.addWidget(self.pushButton)
         self.pushButton_2 = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton_2.setObjectName("pushButton_2")
+        self.pushButton_3 = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton_3.setObjectName("pushButton_3")
         self.horizontalLayout.addWidget(self.pushButton_2)
         self.verticalLayout_2.addLayout(self.horizontalLayout)
         self.verticalLayout = QtWidgets.QVBoxLayout()
@@ -59,7 +61,10 @@ class Ui_MainWindow(object):
         self.horizontalSlider_2.setTickInterval(1)
         self.horizontalSlider_2.setMinimum(0)
         self.horizontalSlider_2.setMaximum(10)
+        self.horizontalSlider_2.setTickPosition(QSlider.TicksBothSides)
         self.verticalLayout.addWidget(self.horizontalSlider_2)
+        self.verticalLayout.addWidget(self.pushButton_3)
+
         self.verticalLayout_2.addLayout(self.verticalLayout)
         self.gridLayout.addLayout(self.verticalLayout_2, 0, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
@@ -72,10 +77,12 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
+        self.horizontalSlider.setVisible(False)
         self.horizontalSlider.valueChanged['int'].connect(self.th_value)
         self.horizontalSlider_2.valueChanged['int'].connect(self.filter_value)
         self.pushButton.clicked.connect(self.loadImage)
         self.pushButton_2.clicked.connect(self.saveImage)
+        self.pushButton_3.clicked.connect(self.confirmeFiltre)
 
         filtres = ["filtre moyen", "filtre mediane","filtre gaussien","filtre laplacien","filtres morphologiques"]
         self.comboBox.addItem("Selectionner un filtre")
@@ -100,7 +107,7 @@ class Ui_MainWindow(object):
         self.filename = None
         self.tmp = None
         self.blur = 0
-        self.threshold = None
+        # self.threshold = None
 
         self.filter_val = None
         self.morph_val = None 
@@ -113,15 +120,15 @@ class Ui_MainWindow(object):
             self.comboBox_2.setVisible(False)
             self.comboBox_3.setVisible(False)
             if(self.filter_val == "filtre laplacien"):
-                self.horizontalSlider.setVisible(False)
+                # self.horizontalSlider.setVisible(False)
                 self.horizontalSlider_2.setVisible(False)
                 self.updateImage()
             else:
-                self.horizontalSlider.setVisible(True)
+                # self.horizontalSlider.setVisible(True)
                 self.horizontalSlider_2.setVisible(True)
         else:
             self.comboBox_2.setVisible(True)
-            self.horizontalSlider.setVisible(False)
+            # self.horizontalSlider.setVisible(False)
             self.horizontalSlider_2.setVisible(True)
 
 
@@ -147,7 +154,7 @@ class Ui_MainWindow(object):
     def loadImage(self):
         # pour télécharger l'image sélectionnée
         self.filename = QFileDialog.getOpenFileName(filter="Image (*.*)")[0]
-        self.image = cv.imread(self.filename,cv.IMREAD_GRAYSCALE)
+        self.image = cv.imread(self.filename,cv.IMREAD_UNCHANGED)
         self.setPhoto(self.image)
 
     def saveImage(self):
@@ -162,7 +169,12 @@ class Ui_MainWindow(object):
         image = QImage(frame, frame.shape[1],frame.shape[0], frame.strides[0], QImage.Format_RGB888)
         self.label.setPixmap(QtGui.QPixmap.fromImage(image))
 
-
+    def confirmeFiltre(self):
+        self.image = self.tmp
+        self.comboBox.setCurrentIndex(0)
+        self.comboBox_2.setVisible(False)
+        self.comboBox_3.setVisible(False)
+        self.horizontalSlider_2.setSliderPosition(0)
 
     def th_value(self,value):
         self.threshold = int((value*255)/100)
@@ -239,21 +251,18 @@ class Ui_MainWindow(object):
 
 
     def updateImage(self):
-        if self.filter_val == "Selectionner un filtre":
-            img = self.changeTh(self.image,self.threshold)
-            self.setPhoto(img)
-        else:
+        if self.filter_val != "Selectionner un filtre":
             if self.filter_val == "filtre moyen":
                 img = self.filtreMoyen(self.image,self.blur)
-                img = self.changeTh(img,self.threshold)
+                # img = self.changeTh(img,self.threshold)
                 self.setPhoto(img)
             elif self.filter_val == "filtre mediane":
                 img = self.filtreMedian(self.image,self.blur)
-                img = self.changeTh(img,self.threshold)
+                # img = self.changeTh(img,self.threshold)
                 self.setPhoto(img)
             elif self.filter_val == "filtre gaussien":
                 img = self.filtreGaussian(self.image,self.blur)
-                img = self.changeTh(img,self.threshold)
+                # img = self.changeTh(img,self.threshold)
                 self.setPhoto(img)
             elif self.filter_val == "filtre laplacien":
                 img = self.filtreLaplacian(self.image)
@@ -270,6 +279,7 @@ class Ui_MainWindow(object):
         self.label.setText(_translate("MainWindow", "Télecharger une image"))
         self.pushButton.setText(_translate("MainWindow", "Ouvrir une image"))
         self.pushButton_2.setText(_translate("MainWindow", "Sauvgarder l\'image"))
+        self.pushButton_3.setText(_translate("MainWindow", "Confirmer le filtre"))
 
 
 if __name__ == "__main__":
