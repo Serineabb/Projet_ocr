@@ -169,6 +169,11 @@ class Ui_MainWindow(object):
     def choiceBinarization(self,value):
         self.binarisation_val = value
         self.horizontalSlider.setSliderPosition(0)
+        if self.binarisation_val == "OTSU" : 
+            self.horizontalSlider.setVisible(False)
+            self.updateImage()
+        else :
+            self.horizontalSlider.setVisible(True)
     
     def choiceFilter(self, value):
         self.filter_val = value
@@ -361,24 +366,6 @@ class Ui_MainWindow(object):
         elif filtre =="TopHat":
             filtredImage = cv.morphologyEx(image,cv.MORPH_TOPHAT,noyau)
         return filtredImage
-
-    # def binary_otsus(image, filter):
-    #     #filtre en entré des valeur +1
-    #  """Binarization de l'image  avec Otsu's Binarization"""
-    #  image = cv.cvtColor(image,cv.IMREAD_GRAYSCALE)
-    # #convertir vers grayscale
-    #  if len(image.shape) == 3:
-    #     gray_img = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
-    #  else:
-    #     gray_img = image
-
-    #  if filter != 0:
-    #     blur = cv.GaussianBlur(gray_img, (3,3), 0)
-    #     otsu_img = cv.threshold(blur, 0, 255, cv.THRESH_BINARY+cv.THRESH_OTSU)[1]
-    #  else:
-    #     otsu_img = cv.threshold(gray_img, 0, 255, cv.THRESH_BINARY+cv.THRESH_OTSU)[1]
-    #  return otsu_img
-
 
 
     def updateImage(self):
