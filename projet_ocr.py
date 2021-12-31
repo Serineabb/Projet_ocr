@@ -129,7 +129,7 @@ class Ui_MainWindow(object):
         self.comboBox_4.addItem("Selectionner une action")
         self.comboBox_4.addItems(actions)
 
-        binarisations = ["OTSU","Threshold","Sauvola"]
+        binarisations = ["OTSU","Seuillage","Sauvola"]
         self.comboBox_5.addItem("Selectionner une technique de binarisation")
         self.comboBox_5.addItems(binarisations)
 
@@ -196,26 +196,32 @@ class Ui_MainWindow(object):
             # self.setPhoto(self.image)
             self.action_val = value
             if(self.action_val == "Binarisation"):
+                self.filter_val = None
                 self.setPhoto(cv.cvtColor(self.image,cv.COLOR_BGR2GRAY))
                 self.pushButton_5.setVisible(True)
+                self.comboBox.setCurrentIndex(0)
+                self.comboBox_2.setCurrentIndex(0)
+                self.comboBox_3.setCurrentIndex(0)
                 self.comboBox.setVisible(False)
-                self.comboBox.setVisible(False)
-                self.comboBox.setVisible(False)
+                self.comboBox_2.setVisible(False)
+                self.comboBox_3.setVisible(False)
                 self.horizontalSlider_2.setVisible(False)
                 self.pushButton_3.setVisible(False)
                 self.comboBox_5.setVisible(True)
                 self.horizontalSlider.setVisible(True)
+                # self.horizontalSlider_2.setSliderPosition(0)
 
             elif(self.action_val == "Filtrage"):
                 self.setPhoto(self.image)
-                self.comboBox.setVisible(True)
-                self.comboBox.setVisible(True)
                 self.comboBox.setVisible(True)
                 self.horizontalSlider_2.setVisible(True)
                 self.pushButton_3.setVisible(True)
                 self.comboBox_5.setVisible(False)
                 self.horizontalSlider.setVisible(False)
+                self.comboBox_5.setCurrentIndex(0)
                 self.pushButton_5.setVisible(False)
+                self.binarisation_val = None
+
 
     def choiceMorph(self, value):
         self.morph_val = value
@@ -264,7 +270,7 @@ class Ui_MainWindow(object):
         self.image = self.tmp
         self.binarisation_val = None
         self.comboBox_5.setCurrentIndex(0)
-        # self.horizontalSlider.setSliderPosition(0)
+        self.horizontalSlider.setSliderPosition(0)
 
     def confirmeFiltre(self):
         self.image = self.tmp
@@ -391,7 +397,7 @@ class Ui_MainWindow(object):
                     self.setPhoto(img)
         
         if self.binarisation_val != "Selectionner une technique de binarisation":
-            if self.binarisation_val == "Threshold":
+            if self.binarisation_val == "Seuillage":
                 img = cv.cvtColor(self.image,cv.COLOR_BGR2GRAY)
                 img = self.changeTh(img,self.threshold)
                 self.setPhoto(img)
